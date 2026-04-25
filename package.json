@@ -1,0 +1,9 @@
+{
+  "name": "curriculo-facil",
+  "version": "1.0.0",
+  "description": "Gerador de currículos com IA",
+  "type": "module",
+  "engines": {
+    "node": ">=18.x"
+  }
+}

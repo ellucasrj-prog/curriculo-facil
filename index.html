@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Currículo Fácil</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      max-width: 560px;
+      width: 100%;
+    }
+    h1 { color: #1a56db; font-size: 1.9rem; margin-bottom: 8px; text-align: center; }
+    .subtitulo { text-align: center; color: #555; margin-bottom: 25px; font-size: 1.05rem; }
+    .pergunta { font-size: 1.05rem; margin: 18px 0 6px; color: #333; font-weight: 600; }
+    .ajuda { font-size: 0.85rem; color: #666; margin-bottom: 6px; }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-family: inherit;
+    }
+    input:focus, textarea:focus { outline: none; border-color: #1a56db; }
+    textarea { resize: vertical; min-height: 100px; }
+    button {
+      background: #1a56db;
+      color: white;
+      border: none;
+      padding: 15px;
+      font-size: 1.15rem;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 15px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    button:hover:not(:disabled) { background: #1546b0; }
+    button:disabled { background: #94a3b8; cursor: not-allowed; }
+    button.secundario { background: #f3f4f6; color: #333; margin-top: 8px; }
+    button.secundario:hover:not(:disabled) { background: #e5e7eb; }
+    button.pago { background: #16a34a; }
+    button.pago:hover:not(:disabled) { background: #15803d; }
+    .resultado {
+      text-align: left;
+      background: #f9fafb;
+      padding: 25px;
+      border-radius: 10px;
+      margin: 20px 0;
+      border: 1px solid #e5e7eb;
+      white-space: pre-wrap;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #1f2937;
+    }
+    .oculto { display: none; }
+    .erro {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-size: 0.95rem;
+    }
+    .preco-info {
+      background: #fef3c7;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 15px 0;
+      text-align: center;
+      font-size: 1rem;
+      color: #78350f;
+    }
+    .loading {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 3px solid #fff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: girar 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes girar { to { transform: rotate(360deg); } }
+
+    /* Estilo de impressão — vira PDF perfeito quando o usuário imprime */
+    @media print {
+      body { background: white; padding: 0; }
+      .container { box-shadow: none; padding: 0; max-width: 100%; }
+      .nao-imprimir { display: none !important; }
+      .resultado { border: none; background: white; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📝 Meu Currículo Fácil</h1>
+    <p class="subtitulo">Responda as perguntas e tenha um currículo pronto em segundos.</p>
+
+    <div id="formulario">
+      <div class="pergunta">Nome completo</div>
+      <input type="text" id="nome" placeholder="Ex: Maria Silva dos Santos">
+
+      <div class="pergunta">Sobre você (opcional)</div>
+      <div class="ajuda">Conte em uma frase quem você é profissionalmente.</div>
+      <input type="text" id="resumo" placeholder="Ex: Atendente com 10 anos de experiência em padaria">
+
+      <div class="pergunta">Suas experiências de trabalho *</div>
+      <div class="ajuda">Pode escrever do seu jeito. A IA vai organizar.</div>
+      <textarea id="experiencias" rows="5" placeholder="Ex: Trabalhei na Padaria Pão Quente de 2010 a 2020 como atendente. Antes disso fui caixa no Mercado Bom Preço por 3 anos..."></textarea>
+
+      <div class="pergunta">Formação (opcional)</div>
+      <input type="text" id="formacao" placeholder="Ex: Ensino Médio completo, curso de atendimento ao cliente">
+
+      <div id="erroForm" class="erro oculto"></div>
+
+      <button id="btnGerar" onclick="gerarCurriculo()">✨ GERAR CURRÍCULO GRÁTIS</button>
+    </div>
+
+    <div id="curriculoPronto" class="oculto">
+      <div class="resultado" id="conteudoCurriculo"></div>
+
+      <div class="nao-imprimir">
+        <div class="preco-info">
+          💡 <strong>Gostou?</strong> Baixe o PDF profissional por apenas <strong>R$ 14,90</strong>.
+        </div>
+        <button class="pago" onclick="liberarDownload()">📥 BAIXAR PDF (R$ 14,90)</button>
+        <button class="secundario" onclick="copiarTexto()">📋 Copiar texto</button>
+        <button class="secundario" onclick="reiniciar()">↩️ Fazer outro</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function mostrarErro(msg) {
+      const erro = document.getElementById('erroForm');
+      erro.textContent = msg;
+      erro.classList.remove('oculto');
+    }
+
+    function esconderErro() {
+      document.getElementById('erroForm').classList.add('oculto');
+    }
+
+    async function gerarCurriculo() {
+      esconderErro();
+
+      const dados = {
+        nome: document.getElementById('nome').value.trim(),
+        resumo: document.getElementById('resumo').value.trim(),
+        experiencias: document.getElementById('experiencias').value.trim(),
+        formacao: document.getElementById('formacao').value.trim()
+      };
+
+      if (!dados.nome) {
+        mostrarErro('Por favor, preencha seu nome.');
+        return;
+      }
+      if (!dados.experiencias || dados.experiencias.length < 15) {
+        mostrarErro('Conte um pouco mais sobre suas experiências (pelo menos uma frase).');
+        return;
+      }
+
+      const btn = document.getElementById('btnGerar');
+      btn.innerHTML = '<span class="loading"></span> Gerando seu currículo...';
+      btn.disabled = true;
+
+      try {
+        const resposta = await fetch('/api/gerar-curriculo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dados)
+        });
+
+        const data = await resposta.json();
+
+        if (!resposta.ok) {
+          throw new Error(data.erro || 'Erro ao gerar currículo');
+        }
+
+        document.getElementById('conteudoCurriculo').textContent = data.curriculo;
+        document.getElementById('formulario').classList.add('oculto');
+        document.getElementById('curriculoPronto').classList.remove('oculto');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (erro) {
+        mostrarErro('Ops! ' + erro.message + ' Tente novamente.');
+      } finally {
+        btn.innerHTML = '✨ GERAR CURRÍCULO GRÁTIS';
+        btn.disabled = false;
+      }
+    }
+
+    function liberarDownload() {
+      // No MVP: usa a impressão do navegador (gera PDF perfeito).
+      // Depois: trocar por redirect para o Mercado Pago,
+      //   e só liberar window.print() após confirmar pagamento.
+      alert('Simulação de pagamento. Em seguida o navegador abrirá a janela de impressão — escolha "Salvar como PDF".');
+      setTimeout(() => window.print(), 800);
+    }
+
+    async function copiarTexto() {
+      const texto = document.getElementById('conteudoCurriculo').textContent;
+      try {
+        await navigator.clipboard.writeText(texto);
+        alert('Texto copiado! Cole onde quiser.');
+      } catch {
+        alert('Não foi possível copiar. Selecione o texto manualmente.');
+      }
+    }
+
+    function reiniciar() {
+      location.reload();
+    }
+  </script>
+</body>
+</html>
