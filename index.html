@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meu Currículo Fácil</title>
+  <title>Meu Currículo Fácil — Currículo profissional em 1 minuto</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -14,13 +14,14 @@
       align-items: flex-start;
       min-height: 100vh;
       padding: 20px;
+      color: #1f2937;
     }
     .container {
       background: white;
       padding: 30px;
       border-radius: 20px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      max-width: 560px;
+      max-width: 580px;
       width: 100%;
     }
     h1 { color: #1a56db; font-size: 1.9rem; margin-bottom: 8px; text-align: center; }
@@ -36,7 +37,7 @@
       font-family: inherit;
     }
     input:focus, textarea:focus { outline: none; border-color: #1a56db; }
-    textarea { resize: vertical; min-height: 100px; }
+    textarea { resize: vertical; min-height: 110px; }
     button {
       background: #1a56db;
       color: white;
@@ -56,19 +57,52 @@
     button.secundario:hover:not(:disabled) { background: #e5e7eb; }
     button.pago { background: #16a34a; }
     button.pago:hover:not(:disabled) { background: #15803d; }
-    .resultado {
-      text-align: left;
-      background: #f9fafb;
-      padding: 25px;
-      border-radius: 10px;
-      margin: 20px 0;
+
+    .preview-curriculo {
+      background: white;
       border: 1px solid #e5e7eb;
-      white-space: pre-wrap;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 20px 0;
       font-family: Georgia, "Times New Roman", serif;
-      font-size: 1rem;
-      line-height: 1.6;
-      color: #1f2937;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
+    .preview-header {
+      background: #1a56db;
+      color: white;
+      padding: 22px 24px;
+    }
+    .preview-nome {
+      font-size: 1.5rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .preview-titulo {
+      font-size: 0.85rem;
+      opacity: 0.95;
+      font-style: italic;
+    }
+    .preview-corpo { padding: 22px 24px; }
+    .preview-secao { margin-bottom: 20px; }
+    .preview-secao:last-child { margin-bottom: 0; }
+    .preview-secao-titulo {
+      color: #1a56db;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      border-bottom: 2px solid #1a56db;
+      padding-bottom: 4px;
+      margin-bottom: 10px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .preview-secao-conteudo {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: #333;
+      white-space: pre-wrap;
+    }
+
     .oculto { display: none; }
     .erro {
       background: #fee2e2;
@@ -87,6 +121,16 @@
       font-size: 1rem;
       color: #78350f;
     }
+    .selo {
+      display: inline-block;
+      background: #16a34a;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
     .loading {
       display: inline-block;
       width: 18px;
@@ -99,13 +143,14 @@
       margin-right: 8px;
     }
     @keyframes girar { to { transform: rotate(360deg); } }
-
-    /* Estilo de impressão — vira PDF perfeito quando o usuário imprime */
-    @media print {
-      body { background: white; padding: 0; }
-      .container { box-shadow: none; padding: 0; max-width: 100%; }
-      .nao-imprimir { display: none !important; }
-      .resultado { border: none; background: white; padding: 0; }
+    .marca-dagua {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.7rem;
+      padding: 8px;
+      border-top: 1px dashed #e5e7eb;
+      font-family: -apple-system, sans-serif;
+      font-style: italic;
     }
   </style>
 </head>
@@ -115,8 +160,15 @@
     <p class="subtitulo">Responda as perguntas e tenha um currículo pronto em segundos.</p>
 
     <div id="formulario">
-      <div class="pergunta">Nome completo</div>
+      <div class="pergunta">Nome completo *</div>
       <input type="text" id="nome" placeholder="Ex: Maria Silva dos Santos">
+
+      <div class="pergunta">Telefone e e-mail (opcional)</div>
+      <div class="ajuda">Para constar no topo do currículo.</div>
+      <input type="text" id="contato" placeholder="Ex: (11) 99999-9999 — maria@email.com">
+
+      <div class="pergunta">Cidade onde mora (opcional)</div>
+      <input type="text" id="cidade" placeholder="Ex: São Paulo, SP">
 
       <div class="pergunta">Sobre você (opcional)</div>
       <div class="ajuda">Conte em uma frase quem você é profissionalmente.</div>
@@ -135,20 +187,32 @@
     </div>
 
     <div id="curriculoPronto" class="oculto">
-      <div class="resultado" id="conteudoCurriculo"></div>
+      <span class="selo">✓ CURRÍCULO PRONTO</span>
+      <p style="font-size: 0.95rem; color: #555; margin-bottom: 12px;">
+        Veja abaixo como ficou. Para baixar o <strong>PDF profissional sem marca d'água</strong>, basta confirmar o pagamento.
+      </p>
 
-      <div class="nao-imprimir">
-        <div class="preco-info">
-          💡 <strong>Gostou?</strong> Baixe o PDF profissional por apenas <strong>R$ 14,90</strong>.
+      <div class="preview-curriculo" id="previewCurriculo">
+        <div class="preview-header">
+          <div class="preview-nome" id="previewNome"></div>
+          <div class="preview-titulo" id="previewTitulo"></div>
         </div>
-        <button class="pago" onclick="liberarDownload()">📥 BAIXAR PDF (R$ 14,90)</button>
-        <button class="secundario" onclick="copiarTexto()">📋 Copiar texto</button>
-        <button class="secundario" onclick="reiniciar()">↩️ Fazer outro</button>
+        <div class="preview-corpo" id="previewCorpo"></div>
+        <div class="marca-dagua">⚠ Visualização — pague R$ 14,90 para baixar sem esta marca</div>
       </div>
+
+      <div class="preco-info">
+        💡 <strong>Gostou?</strong> Baixe o PDF profissional por apenas <strong>R$ 14,90</strong>.
+      </div>
+      <button class="pago" onclick="liberarDownload()">📥 BAIXAR PDF (R$ 14,90)</button>
+      <button class="secundario" onclick="reiniciar()">↩️ Fazer outro</button>
     </div>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
+    let curriculoEstruturado = null;
+
     function mostrarErro(msg) {
       const erro = document.getElementById('erroForm');
       erro.textContent = msg;
@@ -164,6 +228,8 @@
 
       const dados = {
         nome: document.getElementById('nome').value.trim(),
+        contato: document.getElementById('contato').value.trim(),
+        cidade: document.getElementById('cidade').value.trim(),
         resumo: document.getElementById('resumo').value.trim(),
         experiencias: document.getElementById('experiencias').value.trim(),
         formacao: document.getElementById('formacao').value.trim()
@@ -195,7 +261,9 @@
           throw new Error(data.erro || 'Erro ao gerar currículo');
         }
 
-        document.getElementById('conteudoCurriculo').textContent = data.curriculo;
+        curriculoEstruturado = data.curriculo;
+        renderizarPreview(curriculoEstruturado);
+
         document.getElementById('formulario').classList.add('oculto');
         document.getElementById('curriculoPronto').classList.remove('oculto');
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -207,22 +275,132 @@
       }
     }
 
-    function liberarDownload() {
-      // No MVP: usa a impressão do navegador (gera PDF perfeito).
-      // Depois: trocar por redirect para o Mercado Pago,
-      //   e só liberar window.print() após confirmar pagamento.
-      alert('Simulação de pagamento. Em seguida o navegador abrirá a janela de impressão — escolha "Salvar como PDF".');
-      setTimeout(() => window.print(), 800);
+    function renderizarPreview(curr) {
+      document.getElementById('previewNome').textContent = (curr.nome || '').toUpperCase();
+      document.getElementById('previewTitulo').textContent = curr.titulo || '';
+
+      const corpo = document.getElementById('previewCorpo');
+      corpo.innerHTML = '';
+
+      if (curr.contato || curr.cidade) {
+        const linha = document.createElement('div');
+        linha.style.cssText = 'font-size: 0.85rem; color: #555; margin-bottom: 18px; font-family: -apple-system, sans-serif;';
+        linha.textContent = [curr.contato, curr.cidade].filter(Boolean).join(' • ');
+        corpo.appendChild(linha);
+      }
+
+      const secoes = [
+        { titulo: 'RESUMO PROFISSIONAL', conteudo: curr.resumo },
+        { titulo: 'EXPERIÊNCIA PROFISSIONAL', conteudo: curr.experiencia },
+        { titulo: 'FORMAÇÃO', conteudo: curr.formacao },
+        { titulo: 'HABILIDADES', conteudo: curr.habilidades }
+      ];
+
+      for (const s of secoes) {
+        if (!s.conteudo) continue;
+        const div = document.createElement('div');
+        div.className = 'preview-secao';
+        div.innerHTML = `
+          <div class="preview-secao-titulo">${s.titulo}</div>
+          <div class="preview-secao-conteudo">${escapeHTML(s.conteudo)}</div>
+        `;
+        corpo.appendChild(div);
+      }
     }
 
-    async function copiarTexto() {
-      const texto = document.getElementById('conteudoCurriculo').textContent;
-      try {
-        await navigator.clipboard.writeText(texto);
-        alert('Texto copiado! Cole onde quiser.');
-      } catch {
-        alert('Não foi possível copiar. Selecione o texto manualmente.');
+    function escapeHTML(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function liberarDownload() {
+      const confirmar = confirm(
+        '💳 Simulação de pagamento\n\n' +
+        'Em produção, aqui você seria redirecionado para o Mercado Pago.\n\n' +
+        'Clique OK para baixar o PDF profissional (sem marca d\'água).'
+      );
+      if (confirmar) gerarPDF();
+    }
+
+    function gerarPDF() {
+      if (!curriculoEstruturado) return;
+      const c = curriculoEstruturado;
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+
+      const pageW = 210;
+      const pageH = 297;
+      const margem = 18;
+      let y = 0;
+
+      // Cabeçalho azul
+      doc.setFillColor(26, 86, 219);
+      doc.rect(0, 0, pageW, 38, 'F');
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(20);
+      doc.text((c.nome || '').toUpperCase(), margem, 18);
+
+      if (c.titulo) {
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(11);
+        doc.text(c.titulo, margem, 26);
       }
+
+      const linhaContato = [c.contato, c.cidade].filter(Boolean).join('  •  ');
+      if (linhaContato) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.text(linhaContato, margem, 33);
+      }
+
+      y = 50;
+
+      const secao = (titulo, conteudo) => {
+        if (!conteudo) return;
+
+        if (y > pageH - 30) {
+          doc.addPage();
+          y = margem;
+        }
+
+        doc.setTextColor(26, 86, 219);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text(titulo, margem, y);
+
+        doc.setDrawColor(26, 86, 219);
+        doc.setLineWidth(0.6);
+        doc.line(margem, y + 1.5, pageW - margem, y + 1.5);
+
+        y += 7;
+
+        doc.setTextColor(40, 40, 40);
+        doc.setFont('times', 'normal');
+        doc.setFontSize(11);
+
+        const linhas = doc.splitTextToSize(conteudo, pageW - margem * 2);
+        for (const linha of linhas) {
+          if (y > pageH - 20) {
+            doc.addPage();
+            y = margem;
+          }
+          doc.text(linha, margem, y);
+          y += 5.5;
+        }
+
+        y += 5;
+      };
+
+      secao('RESUMO PROFISSIONAL', c.resumo);
+      secao('EXPERIÊNCIA PROFISSIONAL', c.experiencia);
+      secao('FORMAÇÃO', c.formacao);
+      secao('HABILIDADES', c.habilidades);
+
+      const nomeArquivo = `curriculo_${(c.nome || 'profissional').toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')}.pdf`;
+      doc.save(nomeArquivo);
     }
 
     function reiniciar() {
